@@ -17,7 +17,7 @@ public:
 	//constructors
 
 	Vector() :data(nullptr), size(0), capacity(0) {};
-	Vector(size_t count, T value);
+	Vector(size_t count,const T& value);
 	Vector(std::initializer_list<T> initList);
 	Vector(const Vector& vector_obj);
 
@@ -29,7 +29,7 @@ public:
 
 	size_t getSize() const { return size; };
 	size_t getCapacity() const { return capacity; };
-	bool isempty();
+	const bool isempty();
 	void reserve(size_t new_cap);
 	void clear();
 	void push_back(const T& value);
@@ -43,12 +43,13 @@ public:
 	Vector<T>& operator=(const Vector<T>& vector_obj2);
 	bool operator==(const Vector<T>& vector) const;
 	T& operator[](size_t index);
+	T& operator[](size_t index) const;
 };
 
 
 //constructor that create vector with number of values(if wanna string value use " " to intialize
 template <typename T>
-inline Vector<T>::Vector(size_t count, T value) {
+inline Vector<T>::Vector(size_t count, const T& value) {
 	size = count;
 	capacity = count;
 	data = new T[capacity];
@@ -100,15 +101,14 @@ inline Vector<T>& Vector<T>::operator =(const Vector<T>& vector_obj2) {
 
 		delete[] data;
 
+		data = nullptr;
+
 		if (capacity > 0) {
 			data = new T[capacity];
 			for (size_t i = 0; i < size; i++) {
 				data[i] = vector_obj2.data[i];
 			}
 		}
-	}
-	else {
-		data = nullptr;
 	}
 	return *this;
 }
@@ -145,6 +145,15 @@ inline T& Vector<T>::operator[](size_t index)
 	return data[index];
 }
 
+template<typename T>
+inline T& Vector<T>::operator[](size_t index) const
+{
+	if (!at(index)) {
+		return *reinterpret_cast<const T*>(nullptr);
+	}
+	return data[index];
+}
+
 //func for checking bounds
 
 template<typename T>
@@ -153,10 +162,9 @@ inline bool Vector<T>::at(size_t index)
 	return index < size;
 }
 
-
 //isempty function
 template<typename T>
-inline bool Vector<T>::isempty() {
+inline const bool Vector<T>::isempty() {
 	if (size == 0) {
 		return true;
 	}
